@@ -8,7 +8,7 @@ local string_format = string.format
 local cjson_encode = require "cjson.safe".encode
 local cjson_decode = require "cjson.safe".decode
 
-local version = '1.0'
+local version = '1.1'
 
 local function utf8len(s)
     local _, cnt = s:gsub('[^\128-\193]',"")
