@@ -1,11 +1,6 @@
 # lua-resty-validator
-Clean the value (with a optional model).
-
-# Requirements
-Nothing.
+Validator used by [lua-resty-model](https://github.com/xiangnanscu/lua-resty-model).
 
 # Synopsis
 ```
-
-
 ```
