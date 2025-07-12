@@ -11,20 +11,13 @@ local type = type
 local string_format = string.format
 local cjson_encode = require "cjson.safe".encode
 local cjson_decode = require "cjson.safe".decode
+local NULL = require "cjson".null
 local ENCODE_AS_ARRAY = require "cjson".empty_array_mt
 
 
 local function utf8len(s)
   local _, cnt = s:gsub("[^\128-\193]", "")
   return cnt
-end
-
-local function mysql_null_converter(v)
-  if tostring(v) == "userdata: NULL" then
-    return nil
-  else
-    return v
-  end
 end
 
 local function required(message)
@@ -41,7 +34,7 @@ local function required(message)
 end
 
 local function not_required(v)
-  if v == nil or v == "" then
+  if v == nil or v == "" or v == NULL then
     return
   else
     return v
@@ -129,7 +122,7 @@ end
 
 local function year_month(v)
   local err
-  v, err = match(v, [[^\d{4}\.[01]\d$]], "josui")
+  v, err = match(v, [[^\d{4}[-.][01]\d$]], "josui")
   if v then
     return v[0]
   elseif err then
@@ -391,7 +384,7 @@ end
 
 local a = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 }
 local b = { "1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2" }
-local function validate_sfzh(s)
+local function validate_id_card(s)
   local n = 0
   for i = 1, 17 do
     n = n + tonumber(s:sub(i, i)) * a[i]
@@ -403,7 +396,7 @@ local function validate_sfzh(s)
   end
 end
 
-local function sfzh(v)
+local function id_card(v)
   if utf8len(v) ~= 18 then
     return nil, string_format("身份证号必须为18位，当前%s位", #v)
   end
@@ -414,7 +407,7 @@ local function sfzh(v)
   if res == nil then
     return nil, "身份证号日期部分错误:" .. err
   end
-  return validate_sfzh(v)
+  return validate_id_card(v)
 end
 
 local function email(v)
@@ -445,7 +438,6 @@ return {
   decode = decode,
   number = number,
   as_is = as_is,
-  mysql_null_converter = mysql_null_converter,
   encode_as_array = encode_as_array,
   year_month = year_month,
   year = year,
@@ -456,8 +448,8 @@ return {
   delete_spaces = delete_spaces,
   boolean = boolean,
   boolean_cn = boolean_cn,
-  sfzh = sfzh,
+  id_card = id_card,
   email = email,
-  validate_sfzh = validate_sfzh,
+  validate_id_card = validate_id_card,
   bool_map = bool_map
 }
